@@ -7,7 +7,7 @@ function [u_x, u_y, p] = solve(mesh, mu, force_f)
   n_dof = n_u_dof * 2 + n_nodes;
 
   % elementary integrals:
-  ints = elementary_integrals_p1bulle();
+  ints = functional.elementary_integrals_p1bulle();
 
   % build the degree of freedom map to take the bubbles into account:
   dof_map = [mesh.elements, ((n_nodes + 1):n_u_dof)'];

@@ -1,4 +1,4 @@
-function rhs = assemble_p1_td_convection_rhs(mesh, ints, rhs_f, delta, w_f, u, tau)
+function rhs = assemble_p1_convection_evolutive_rhs(mesh, ints, rhs_f, delta, w_f, u, tau)
 
   % assemble the right hand side:
   rhs = zeros(size(mesh.nodes, 1), 1);

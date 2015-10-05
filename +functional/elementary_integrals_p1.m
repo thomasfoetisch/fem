@@ -1,4 +1,4 @@
-function ints = elementary_integrals()
+function ints = elementary_integrals_p1()
 
   % elementary integrals for p1 lagrange
   ints = struct();

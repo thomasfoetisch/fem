@@ -1,4 +1,4 @@
-function rhs = assemble_p1_convection_rhs(mesh, ints, rhs_f, delta, w_f)
+function rhs = assemble_p1_gls_rhs(mesh, ints, rhs_f, delta, w_f)
 
   % assemble the right hand side:
   rhs = zeros(size(mesh.nodes, 1), 1);

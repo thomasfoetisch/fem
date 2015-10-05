@@ -23,28 +23,28 @@ u_exact_f = @(x, t) x(:, 1) < 0.5 * t;
 
 %% INITIALIZE ENVIRONMENT
 % elementary integrals on the reference triangle:
-ints = elementary_integrals();
+ints = functional.elementary_integrals_p1();
 
 % build a square mesh:
-mesh = build_square_mesh(l_x, l_y, n_el_x, n_el_y, theta);
-inflow_nodes = input_flow_surface_nodes(mesh, w_f);
+mesh = geometry.build_square_mesh(l_x, l_y, n_el_x, n_el_y, theta);
+inflow_nodes = geometry.input_flow_surface_nodes(mesh, w_f);
 
 
 %% MATRIX ASSEMBLY
-mat = assemble_p1_td_convection_matrix(mesh, ints, w_f, mu, delta, tau);
-mat = set_mat_boundary_conditions(mesh, mat, dbc_f, inflow_nodes);
+mat = convection2d.assemble_p1_convection_evolutive_matrix(mesh, ints, w_f, mu, delta, tau);
+mat = convection2d.set_mat_boundary_conditions(mesh, mat, dbc_f, inflow_nodes);
 
 
 %% INITIAL CONDITION
 u = u_init_f(mesh.nodes);
-u = set_rhs_boundary_conditions(mesh, u, dbc_f, inflow_nodes);
+u = convection2d.set_rhs_boundary_conditions(mesh, u, dbc_f, inflow_nodes);
 
 sol = {u};
 %% TIME EVOLUTION
 for k = 1:80
   printf('time step #%i\n', k); fflush(stdout);
-  rhs = assemble_p1_td_convection_rhs(mesh, ints, rhs_f, delta, w_f, u, tau);
-  rhs = set_rhs_boundary_conditions(mesh, rhs, dbc_f, inflow_nodes);
+  rhs = convection2d.assemble_p1_convection_evolutive_rhs(mesh, ints, rhs_f, delta, w_f, u, tau);
+  rhs = convection2d.set_rhs_boundary_conditions(mesh, rhs, dbc_f, inflow_nodes);
 
   %% LINEAR PROBLEM
   u = linsolve(mat, rhs);

@@ -4,31 +4,31 @@ l_x = 1;
 l_y = 1;
 
 % subdivision of the domain
-n_el_x = 20;
-n_el_y = 20;
+n_el_x = 10;
+n_el_y = 10;
 
 
 % pde parameters:
 mu = 1e-3; % diffusion parameter:
 w_f = @(x) [ones(size(x, 1), 1), -ones(size(x, 1), 1)]; % convection
-rhs_f = @(x) ones(size(x, 1), 1); 
+rhs_f = @(x) ones(size(x, 1), 1);
 dbc_f = @(x) zeros(size(x, 1));
 
 
 %% INITIALIZE ENVIRONMENT
 % elementary integrals on the reference triangle:
-ints = elementary_integrals();
+ints = functional.elementary_integrals_p1();
 
 % build a square mesh:
-mesh = build_square_mesh(l_x, l_y, n_el_x, n_el_y);
+mesh = geometry.build_square_mesh(l_x, l_y, n_el_x, n_el_y, 0);
 
 
 %% MATRIX ASSEMBLY
-rhs = assemble_p1_convection_rhs(mesh, ints, rhs_f, 0.5, w_f);
-mat = assemble_p1_convection_matrix(mesh, ints, w_f, mu, 0.5);
+rhs = convection2d.assemble_p1_gls_rhs(mesh, ints, rhs_f, 0.5, w_f);
+mat = convection2d.assemble_p1_gls_matrix(mesh, ints, w_f, mu, 0.5);
 
-%inflow_nodes = input_flow_surface_nodes(mesh, w_f);
-[mat, rhs] = set_boundary_conditions(mesh, mat, rhs, dbc_f, mesh.boundary_nodes);
+%inflow_nodes = geometry.input_flow_surface_nodes(mesh, w_f);
+[mat, rhs] = convection2d.set_boundary_conditions(mesh, mat, rhs, dbc_f, mesh.boundary_nodes);
 
 
 %% LINEAR PROBLEM

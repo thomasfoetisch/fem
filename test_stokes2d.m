@@ -9,7 +9,7 @@ n_el_x = 5;
 n_el_y = 5;
 
 % build a square mesh:
-mesh = build_square_mesh(l_x, l_y, n_el_x, n_el_y, 0);
+mesh = geometry.build_square_mesh(l_x, l_y, n_el_x, n_el_y, 0);
 
 % pde parameters:
 mu = 1.0;

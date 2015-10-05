@@ -1,4 +1,4 @@
-function mat = assemble_p1_convection_matrix(mesh, ints, w_f, mu, delta)
+function mat = assemble_p1_gls_matrix(mesh, ints, w_f, mu, delta)
 
   % initialise the matrix:
   mat = spalloc(size(mesh.adj, 1), ...

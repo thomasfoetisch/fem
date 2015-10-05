@@ -1,4 +1,4 @@
-function mat = assemble_p1_td_convection_matrix(mesh, ints, w_f, mu, delta, tau)
+function mat = assemble_p1_convection_evolutive_matrix(mesh, ints, w_f, mu, delta, tau)
 
   % initialise the matrix:
   mat = spalloc(size(mesh.adj, 1), ...

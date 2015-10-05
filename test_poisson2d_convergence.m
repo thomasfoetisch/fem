@@ -4,7 +4,7 @@ err = zeros(1, 4);
 
 for i = 1:length(h)
     h(i) = 2^(-2 - i); 
-    [nodes, ~, u, u_exact, err(i)] = laplacian(h(i));
+    [nodes, ~, u, u_exact, err(i)] = test_poisson2d(h(i));
 end
 order = polyfit(log(h), log(err), 1)(1);
 
