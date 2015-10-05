@@ -1,4 +1,4 @@
-function [mat, rhs] = set_stokes_boundary_condition(mesh, mat, rhs, pressure_constraint_type)
+function [mat, rhs] = set_boundary_conditions(mesh, mat, rhs, pressure_constraint_type)
 
   n_nodes = size(mesh.nodes, 1);
   n_elems = size(mesh.elements, 1);

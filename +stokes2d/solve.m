@@ -1,4 +1,4 @@
-function [u_x, u_y, p] = solve_stokes(mesh, mu, force_f)
+function [u_x, u_y, p] = solve(mesh, mu, force_f)
 
   % system sizes:
   n_nodes = size(mesh.nodes, 1);
@@ -13,13 +13,13 @@ function [u_x, u_y, p] = solve_stokes(mesh, mu, force_f)
   dof_map = [mesh.elements, ((n_nodes + 1):n_u_dof)'];
 
   % build the linear system:
-  mat = assemble_p1bullep1_stokes_matrix(mesh, dof_map, ints, mu);
+  mat = stokes2d.assemble_p1bullep1_matrix(mesh, dof_map, ints, mu);
 
   % build the linear system rhs:
-  rhs = assemble_p1bullep1_stokes_rhs(mesh, dof_map, ints, force_f);
+  rhs = stokes2d.assemble_p1bullep1_rhs(mesh, dof_map, ints, force_f);
 
   % set the boundary condition for the velocity, and remove the kernel for the pressure:
-  [mat, rhs] = set_stokes_boundary_condition(mesh, mat, rhs, 'mean');
+  [mat, rhs] = stokes2d.set_boundary_conditions(mesh, mat, rhs, 'mean');
 
   % solve the system and extract the different variables:
-  [u_x, u_y, p] = solve_stokes_linear_system(mesh, mat, rhs);
+  [u_x, u_y, p] = stokes2d.solve_linear_system(mesh, mat, rhs);

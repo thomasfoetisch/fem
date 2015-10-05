@@ -1,4 +1,4 @@
-function rhs = assemble_p1bullep1_stokes_rhs(mesh, dof_map, ints, force_f)
+function rhs = assemble_p1bullep1_rhs(mesh, dof_map, ints, force_f)
 
   % system sizes:
   n_nodes = size(mesh.nodes, 1);

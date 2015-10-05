@@ -1,4 +1,4 @@
-function [u_x, u_y, p, x] = solve_stokes_linear_system(mesh, mat, rhs)
+function [u_x, u_y, p, x] = solve_linear_system(mesh, mat, rhs)
 
   % system sizes:
   n_nodes = size(mesh.nodes, 1);

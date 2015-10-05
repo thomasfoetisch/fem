@@ -15,7 +15,7 @@ mesh = build_square_mesh(l_x, l_y, n_el_x, n_el_y, 0);
 mu = 1.0;
 force_f = @(x) [x(:, 2) > 0.0, zeros(size(x, 1), 1)];
 
-[u_x, u_y, p] = solve_stokes(mesh, mu, force_f);
+[u_x, u_y, p] = stokes2d.solve(mesh, mu, force_f);
 
 % visualisation of the result:
 vis = 1;

@@ -1,4 +1,4 @@
-function mat = assemble_p1_laplacian_matrix(mesh, ints)
+function mat = assemble_p1_matrix(mesh, ints)
   
   % assemble the matrix:
   mat = spalloc(size(mesh.adj, 1), ...

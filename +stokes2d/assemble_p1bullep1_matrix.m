@@ -1,4 +1,4 @@
-function mat = assemble_p1bullep1_stokes_matrix(mesh, dof_map, ints, mu)
+function mat = assemble_p1bullep1_matrix(mesh, dof_map, ints, mu)
 
   % build the matrix:
   n_nodes = size(mesh.nodes, 1);
