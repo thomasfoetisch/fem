@@ -19,7 +19,7 @@ function [u_x, u_y, p] = solve(mesh, mu, force_f)
   rhs = stokes2d.assemble_p1bullep1_rhs(mesh, dof_map, ints, force_f);
 
   % set the boundary condition for the velocity, and remove the kernel for the pressure:
-  [mat, rhs] = stokes2d.set_boundary_conditions(mesh, mat, rhs, 'mean');
+  [mat, rhs] = stokes2d.set_boundary_conditions(mesh, dof_map, ints, mat, rhs, 'mean');
 
   % solve the system and extract the different variables:
   [u_x, u_y, p] = stokes2d.solve_linear_system(mesh, mat, rhs);

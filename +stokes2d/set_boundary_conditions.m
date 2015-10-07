@@ -1,4 +1,4 @@
-function [mat, rhs] = set_boundary_conditions(mesh, mat, rhs, pressure_constraint_type)
+function [mat, rhs] = set_boundary_conditions(mesh, dof_map, ints, mat, rhs, pressure_constraint_type)
 
   n_nodes = size(mesh.nodes, 1);
   n_elems = size(mesh.elements, 1);
@@ -18,9 +18,9 @@ function [mat, rhs] = set_boundary_conditions(mesh, mat, rhs, pressure_constrain
 
   % process the pressure constraint method:
   if strcmpi(pressure_constraint_type, 'mean')
-    mean_pressure = 0;
+    mean_pressure = 1;
   elseif strcmpi(pressure_constraint_type, 'node')
-      mean_pressure = 1;
+      mean_pressure = 0;
   else
       error('Unknown pressure contraint method.');
   end
@@ -34,7 +34,7 @@ function [mat, rhs] = set_boundary_conditions(mesh, mat, rhs, pressure_constrain
 	mean_p(1, 2 * n_u_dof + dof_map(el, i)) = mean_p(1, 2 * n_u_dof + dof_map(el, i)) + mesh.jac(el) * ints.phi(i);
       end
     end
-    mean_p(1, end) = 1;
+    mean_p(1, end) = 0;
     mat = [mat, mean_p(1:end-1)'; mean_p];
     rhs = [rhs; 0];
   else

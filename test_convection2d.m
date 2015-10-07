@@ -1,3 +1,5 @@
+clear all;
+
 %% PROBLEM PARAMETERS
 % geometric dimensions of the domain:
 l_x = 1;
@@ -32,4 +34,13 @@ mat = convection2d.assemble_p1_gls_matrix(mesh, ints, w_f, mu, 0.5);
 
 
 %% LINEAR PROBLEM
-u = linsolve(mat, rhs);
+u = mat \ rhs;
+
+
+% visualisation of the result:
+vis = 1;
+if vis
+  trisurf(mesh.elements, mesh.nodes(:, 1), mesh.nodes(:, 2), u);
+end
+
+
