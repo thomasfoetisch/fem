@@ -7,7 +7,7 @@ n_u_dof = n_nodes + n_elems;
 n_p_dof = n_nodes;
 n_dof = 2 * n_u_dof + n_p_dof;
 
-n_newton_iterations = 0;
+n_newton_iterations = 10;
 
 % build the degree of freedom mapping between the elements and the linear system:
 dof_map = [mesh.elements, (n_nodes + 1:n_u_dof)'];
@@ -23,8 +23,14 @@ x = navierstokes2d.build_newton_initial_solution(mesh);
 
 % newton iteration:
 for k = 1:n_newton_iterations
-  mat = navierstokes2d.assemble_p1bullep1_stationary_matrix();
-  rhs = navierstokes2d.assemble_p1bullep1_stationary_rhs();
+  mat = navierstokes2d.assemble_p1bullep1_stationary_matrix(mesh, dof_map, ints, ...
+							    laminar_viscosity, ...
+							    smagorinsky_coefficient, ...
+							    smagorinsky_caracteristic_length);
+  rhs = navierstokes2d.assemble_p1bullep1_stationary_rhs(mesh, dof_map, ints, ...
+							 laminar_viscosity, ...
+							 smagorinsky_coefficient, ...
+							 smagorinsky_caracteristic_length);
 
   [mat, rhs] = navierstokes2d.set_boundary_conditions(mat, rhs);
 
