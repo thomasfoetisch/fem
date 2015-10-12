@@ -1,4 +1,4 @@
-function [u_x, u_y, p] = solve(mesh, force_f, laminar_viscosity, smagorinsky_coefficient, smagorinsky_caracteristic_length)
+function [u_x, u_y, p] = solve(mesh, force_f, rho, laminar_viscosity, smagorinsky_coefficient, smagorinsky_caracteristic_length)
 
 % problem sizes:
 n_nodes = size(mesh.nodes, 1);
@@ -23,27 +23,31 @@ x = navierstokes2d.build_newton_initial_solution(mesh);
 
 % newton iteration:
 for k = 1:n_newton_iterations
+
+  u_x = x(1:n_u_dof);
+  u_y = x(n_u_dof + (1:n_u_dof));
+  p = x(2 * n_u_dof + (1:n_nodes));
+
   mat = navierstokes2d.assemble_p1bullep1_stationary_matrix(mesh, dof_map, ints, ...
+							    u_x, u_y, ...
+							    rho, ...
 							    laminar_viscosity, ...
 							    smagorinsky_coefficient, ...
 							    smagorinsky_caracteristic_length);
+
   rhs = navierstokes2d.assemble_p1bullep1_stationary_rhs(mesh, dof_map, ints, ...
+							 u_x, u_y, p, ...
+							 force_f, ...
+							 rho, ...
 							 laminar_viscosity, ...
 							 smagorinsky_coefficient, ...
 							 smagorinsky_caracteristic_length);
-
-  [mat, rhs] = navierstokes2d.set_boundary_conditions(mat, rhs);
-
+  [mat, rhs] = navierstokes2d.set_boundary_conditions(mesh, mat, rhs);
+  
   delta_x = mat \ rhs;
-  x = x - delta_x;
+  printf('| delta_x | = %f\n', sqrt(sum(delta_x.^2)));
+  x = x - delta_x(1:(2 * n_u_dof + n_p_dof));
 end
 
-
-%u_x = x(1:n_nodes);
-%u_y = x((n_u_dof + 1):(n_u_dof + n_nodes));
-%p = x((2*n_u_dof + 1):(2*n_u_dof + n_nodes));
-
-% dummy output for successful execution:
-u_x = zeros(n_nodes, 1);
-u_y = zeros(n_nodes, 1);
-p = zeros(n_nodes, 1);
+u_x = u_x(1:n_nodes);
+u_y = u_y(1:n_nodes);
