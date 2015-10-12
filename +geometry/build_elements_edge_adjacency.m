@@ -13,7 +13,7 @@ function adj = build_elements_edge_adjacency(mesh)
        edge_id_1 = find(mesh.elements(edges(edge,     3), :) == setdiff(mesh.elements(edges(edge,     3), :), edges(edge,     1:2)));
        edge_id_2 = find(mesh.elements(edges(edge + 1, 3), :) == setdiff(mesh.elements(edges(edge + 1, 3), :), edges(edge + 1, 1:2)));
        adj(edges(edge, 3), edge_id_1) = edges(edge + 1, 3);
-       adj(edges(edge + 1, 3), edge_id_1) = edges(edge, 3);
+       adj(edges(edge + 1, 3), edge_id_2) = edges(edge, 3);
        edge = edge + 2;
     else
       edge = edge + 1;

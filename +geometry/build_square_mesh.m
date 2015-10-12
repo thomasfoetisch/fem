@@ -42,14 +42,14 @@ function mesh = build_square_mesh(l_x, l_y, n_el_x, n_el_y, theta)
 
   % random permutation of the node numbering:
   perm = randperm(size(nodes, 1));
-  perm = 1:size(nodes, 1);
+  %perm = 1:size(nodes, 1);
   [~, inv_perm] = sort(perm);
 
   nodes = nodes(perm, :);
   elements = reshape(inv_perm(reshape(elements, 1, [])), size(elements));
 
   for e = 1:size(elements, 1)
-    %elements(e, :) = elements(e, randperm(3));
+    elements(e, :) = elements(e, randperm(3));
   end
   elements = int16(elements);
 
