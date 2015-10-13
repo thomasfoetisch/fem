@@ -44,30 +44,34 @@ function rhs = assemble_p1bullep1_stationary_rhs(mesh, dof_map, ints, ...
       for k = 1:4
 	contrib = 0;
 
+	% convection:
 	for q = 1:4
 	  for p = 1:4
 	    for j = 1:2
 	      for d = 1:2
-		contrib = contrib + rho * mesh.jac(el) * u{i}(dofs(q)) * u{j}(dofs(p)) * mesh.jmt(j, d, el) * ints.phiphidphi(p, q, d, k);
+		contrib = contrib + rho * mesh.jac(el) * u{i}(dofs(q)) * u{j}(dofs(p)) * mesh.jmt(j, d, el) * ints.phiphidphi(p, k, d, q);
 	      end
 	    end
 	  end
 	end
 
+	% viscosity:
 	for p = 1:2
 	  for q = 1:2
 	    contrib = contrib + rho * 2 * mesh.jac(el) * mu(el) * epsilon(q, i, el) * mesh.jmt(q, p, el) * ints.dphi(p, k);
 	  end
 	end
 
+	% pressure:
 	for q = 1:2
 	  for p = 1:3
 	    contrib = contrib - mesh.jac(el) * mesh.jmt(i, q, el) * pressure(dofs(p)) * ints.phidphi(p, q, k);
 	  end
 	end
 	
+	% force:
 	for q = 1:3
-	  contrib = contrib - mesh.jac(el) * force_nodes(dofs(q)) * ints.phiphi(q, k);
+	  contrib = contrib - mesh.jac(el) * force_nodes(dofs(q), i) * ints.phiphi(q, k);
 	end
 
 	rhs((i - 1) * n_u_dof + dof_map(el, k), 1) = ...
@@ -75,10 +79,12 @@ function rhs = assemble_p1bullep1_stationary_rhs(mesh, dof_map, ints, ...
       end
     end
 
+
     % assemble G_{k}:
-    contrib = 0;
-    
     for k = 1:3
+      contrib = 0;
+
+      % divergence:
       for q = 1:2
 	for j = 1:4
 	  for p = 1:2

@@ -52,24 +52,40 @@ function mat = assemble_p1bullep1_stationary_matrix(mesh, dof_map, ints, ...
 	      end 
 	    end
 
+	    % viscosity .1
+	    epsilon_norm = max(sqrt(sum((epsilon(:, :, el).^2)(:))), 1.e-4);
 	    for p = 1:2
 	      for q = 1:2
 		for r = 1:2
 		  for s = 1:2
-		    contrib = contrib + rho * 4 * smagorinsky_coefficient * smagorinsky_caracteristic_length^2 ...
-					* mesh.jac(el) * mesh.jmt(p, q, el) * mesh.jmt(s, r, el) * epsilon(m, p, el) * epsilon(s, i, el) * ints.dphidphi(q, n, r, k);
+		    contrib = contrib + rho ...
+					* 4 * smagorinsky_coefficient ...
+					* smagorinsky_caracteristic_length^2 ...
+					* mesh.jac(el) ...
+					* mesh.jmt(p, q, el) * mesh.jmt(s, r, el) ...
+					* epsilon(m, p, el) * epsilon(s, i, el) ...
+					* ints.dphidphi(q, n, r, k) / epsilon_norm;
 		  end
 		end
 	      end
 	    end
-
+	    
+	    % viscosity .2
 	    for p = 1:2
 	      for q = 1:2
-		contrib = contrib + rho * mu(el) * mesh.jac(el) * mesh.jmt(i, p, el) * mesh.jmt(m, q, el) * ints.dphidphi(p, n, q, k);
-		for r = 1:2
-		  for s = 1:2
-		    contrib = contrib + rho * mu(el) * mesh.jac(el) * kronecker(i, m) * mesh.jmt(p, s, el) * mesh.jmt(p, r, el) * ints.dphidphi(r, n, s, k);
-		  end
+		contrib = contrib + rho ...
+				    * mu(el) * mesh.jac(el) ...
+				    * mesh.jmt(i, p, el) * mesh.jmt(m, q, el) ...
+				    * ints.dphidphi(p, n, q, k);
+	      end
+
+	      for r = 1:2
+		for s = 1:2
+		  contrib = contrib + rho * mu(el) ...
+				      * mesh.jac(el) ...
+				      * kronecker(i, m) ...
+				      * mesh.jmt(p, s, el) * mesh.jmt(p, r, el) ...
+				      * ints.dphidphi(r, n, s, k);
 		end
 	      end
 	    end
@@ -107,7 +123,7 @@ function mat = assemble_p1bullep1_stationary_matrix(mesh, dof_map, ints, ...
 
 	    contrib = 0;
 	    for p = 1:2
-		contrib = contrib + mesh.jac(el) * mesh.jmt(m, p, el) * ints.phidphi(k, p, n);
+		contrib = contrib - mesh.jac(el) * mesh.jmt(m, p, el) * ints.phidphi(k, p, n);
 	    end
 
 	    elem_div(i, k, m) = contrib;
