@@ -1,9 +1,6 @@
-function mat = assemble_p1bullep1_stationary_matrix(mesh, dof_map, ints, ...
+function mat = assemble_p1bullep1_stationary_matrix(mesh, dof_map, ints, basis, ...
 						    u_x, u_y, ...
-						    rho, ...
-						    laminar_viscosity, ...
-						    smagorinsky_coefficient, ...
-						    smagorinsky_caracteristic_length)
+						    ctx)
 
   % problem sizes:
   n_nodes = size(mesh.nodes, 1);
@@ -16,25 +13,15 @@ function mat = assemble_p1bullep1_stationary_matrix(mesh, dof_map, ints, ...
   % matrix allocation:
   mat = spalloc(n_dof, n_dof, 0);
   
-
-  % necessary fields:
+  % helpers:
   u = {u_x, u_y};
-  grad_u_x = navierstokes2d.build_grad_u(mesh, ints, u_x);
-  grad_u_y = navierstokes2d.build_grad_u(mesh, ints, u_y);
-
-  epsilon = navierstokes2d.build_epsilon(mesh, grad_u_x, grad_u_y);
-
-  mu = navierstokes2d.build_mu(mesh, epsilon, ...
-			       laminar_viscosity, ...
-			       smagorinsky_coefficient, ...
-			       smagorinsky_caracteristic_length);
-
   kronecker = eye(2);
 
   for el = 1:n_elems
     printf('mat element %i\n', el);
 
     dofs = dof_map(el, :);
+
 
     elem_u = zeros(2, 4, 2, 4); % i, k, m, n
     for i = 1:2
@@ -45,50 +32,28 @@ function mat = assemble_p1bullep1_stationary_matrix(mesh, dof_map, ints, ...
 	    contrib = 0;
 	    for p = 1:2
 	      for q = 1:4
-		contrib = contrib + rho * mesh.jac(el) * mesh.jmt(m, p, el) * u{i}(dofs(q)) * ints.phiphidphi(n, k, p, q);
+		contrib = contrib + ctx.rho * mesh.jac(el) ...
+				    * mesh.jmt(m, p, el) ...
+				    * u{i}(dofs(q)) ...
+				    * ints.phiphidphi(n, k, p, q);
 		for j = 1:2
-		  contrib = contrib + rho * mesh.jac(el) * mesh.jmt(j, p, el) * u{j}(dofs(q)) *  kronecker(i, m) * ints.phiphidphi(q, k, p, n);
+		  contrib = contrib + ctx.rho * mesh.jac(el) ...
+				      * mesh.jmt(j, p, el) ...
+				      * u{j}(dofs(q)) ...
+				      * kronecker(i, m) ...
+				      * ints.phiphidphi(q, k, p, n);
 		end
 	      end 
 	    end
 
 	    % viscosity .1
-	    epsilon_norm = max(sqrt(sum((epsilon(:, :, el).^2)(:))), 1.e-4);
-	    for p = 1:2
-	      for q = 1:2
-		for r = 1:2
-		  for s = 1:2
-		    contrib = contrib + rho ...
-					* 4 * smagorinsky_coefficient ...
-					* smagorinsky_caracteristic_length^2 ...
-					* mesh.jac(el) ...
-					* mesh.jmt(p, q, el) * mesh.jmt(s, r, el) ...
-					* epsilon(m, p, el) * epsilon(s, i, el) ...
-					* ints.dphidphi(q, n, r, k) / epsilon_norm;
-		  end
-		end
-	      end
-	    end
+	    if 1
+	      contrib = contrib + navierstokes2d.quadrature(@(x) navierstokes2d.viscosity_term_1(x, mesh, dof_map, ctx, u_x, u_y, el, basis, i, k, m, n));
+	    end % enable/disable
 	    
-	    % viscosity .2
-	    for p = 1:2
-	      for q = 1:2
-		contrib = contrib + rho ...
-				    * mu(el) * mesh.jac(el) ...
-				    * mesh.jmt(i, p, el) * mesh.jmt(m, q, el) ...
-				    * ints.dphidphi(p, n, q, k);
-	      end
-
-	      for r = 1:2
-		for s = 1:2
-		  contrib = contrib + rho * mu(el) ...
-				      * mesh.jac(el) ...
-				      * kronecker(i, m) ...
-				      * mesh.jmt(p, s, el) * mesh.jmt(p, r, el) ...
-				      * ints.dphidphi(r, n, s, k);
-		end
-	      end
-	    end
+	    if 1
+	       contrib = contrib + navierstokes2d.quadrature(@(x) navierstokes2d.viscosity_term_2(x, mesh, dof_map, ctx, u_x, u_y, el, basis, i, k, m, n));
+	    end % enable/disable
 
 	    elem_u(i, k, m, n) = contrib;
 	    mat((i - 1) * n_u_dof + dof_map(el, k), (m - 1) * n_u_dof + dof_map(el, n)) = ...
@@ -105,7 +70,7 @@ function mat = assemble_p1bullep1_stationary_matrix(mesh, dof_map, ints, ...
 	    
 	    contrib = 0;
 	    for p = 1:2
-		contrib = contrib - mesh.jac(el) * mesh.jmt(i, p, el) * ints.phidphi(m, p, k);
+	      contrib = contrib - mesh.jac(el) * mesh.jmt(i, p, el) * ints.phidphi(m, p, k);
 	    end
 	    
 	    elem_p(i, k, m) = contrib;

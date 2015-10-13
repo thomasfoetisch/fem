@@ -1,10 +1,7 @@
-function rhs = assemble_p1bullep1_stationary_rhs(mesh, dof_map, ints, ...
+function rhs = assemble_p1bullep1_stationary_rhs(mesh, dof_map, ints, basis,...
                                                  u_x, u_y, pressure, ...
 						 force_f, ...
-                                                 rho, ...
-                                                 laminar_viscosity, ...
-                                                 smagorinsky_coefficient, ...
-                                                 smagorinsky_caracteristic_length)
+						 ctx)
 
   % problem sizes:
   n_nodes = size(mesh.nodes, 1);
@@ -18,20 +15,11 @@ function rhs = assemble_p1bullep1_stationary_rhs(mesh, dof_map, ints, ...
   rhs = spalloc(n_dof, 1, 0);
   
 
-  % necessary fields:
+  % p1 approximation of the force field:
   force_nodes = force_f(mesh.nodes);
 
+  % helpers:
   u = {u_x, u_y};
-  grad_u_x = navierstokes2d.build_grad_u(mesh, ints, u_x);
-  grad_u_y = navierstokes2d.build_grad_u(mesh, ints, u_y);
-
-  epsilon = navierstokes2d.build_epsilon(mesh, grad_u_x, grad_u_y);
-
-  mu = navierstokes2d.build_mu(mesh, epsilon, ...
-			       laminar_viscosity, ...
-			       smagorinsky_coefficient, ...
-			       smagorinsky_caracteristic_length);
-
   kronecker = eye(2);
 
   for el = 1:n_elems
@@ -49,18 +37,14 @@ function rhs = assemble_p1bullep1_stationary_rhs(mesh, dof_map, ints, ...
 	  for p = 1:4
 	    for j = 1:2
 	      for d = 1:2
-		contrib = contrib + rho * mesh.jac(el) * u{i}(dofs(q)) * u{j}(dofs(p)) * mesh.jmt(j, d, el) * ints.phiphidphi(p, k, d, q);
+		contrib = contrib + ctx.rho * mesh.jac(el) * u{i}(dofs(q)) * u{j}(dofs(p)) * mesh.jmt(j, d, el) * ints.phiphidphi(p, k, d, q);
 	      end
 	    end
 	  end
 	end
 
 	% viscosity:
-	for p = 1:2
-	  for q = 1:2
-	    contrib = contrib + rho * 2 * mesh.jac(el) * mu(el) * epsilon(q, i, el) * mesh.jmt(q, p, el) * ints.dphi(p, k);
-	  end
-	end
+	contrib = contrib + navierstokes2d.quadrature(@(x) navierstokes2d.viscosity_term_rhs(x, mesh, dof_map, ctx, u_x, u_y, el, basis, i, k));
 
 	% pressure:
 	for q = 1:2
@@ -88,7 +72,7 @@ function rhs = assemble_p1bullep1_stationary_rhs(mesh, dof_map, ints, ...
       for q = 1:2
 	for j = 1:4
 	  for p = 1:2
-	    contrib = contrib + mesh.jac(el) * u{q}(dofs(j)) * mesh.jmt(q, p, el) * ints.phidphi(k, p, j);
+	    contrib = contrib - mesh.jac(el) * u{q}(dofs(j)) * mesh.jmt(q, p, el) * ints.phidphi(k, p, j);
 	  end
 	end
       end

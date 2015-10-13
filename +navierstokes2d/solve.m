@@ -1,4 +1,4 @@
-function [u_x, u_y, p] = solve(mesh, force_f, rho, laminar_viscosity, smagorinsky_coefficient, smagorinsky_caracteristic_length)
+function [u_x, u_y, p] = solve(mesh, force_f, ctx)
 
 % problem sizes:
 n_nodes = size(mesh.nodes, 1);
@@ -14,39 +14,46 @@ dof_map = [mesh.elements, (n_nodes + 1:n_u_dof)'];
 
 
 % get the elementary integrals:
-ints = functional.elementary_integrals_p1bulle();
+[ints, basis] = functional.elementary_integrals_p1bulle();
 
 
 % initialise the solution with a guess to start the newton iteration:
 x = navierstokes2d.build_newton_initial_solution(mesh);
-
+u_x = x(1:n_u_dof);
+u_y = x(n_u_dof + (1:n_u_dof));
+p = x(2 * n_u_dof + (1:n_nodes));
 
 % newton iteration:
 for k = 1:n_newton_iterations
-
-  u_x = x(1:n_u_dof);
-  u_y = x(n_u_dof + (1:n_u_dof));
-  p = x(2 * n_u_dof + (1:n_nodes));
-
-  mat = navierstokes2d.assemble_p1bullep1_stationary_matrix(mesh, dof_map, ints, ...
+  mat = navierstokes2d.assemble_p1bullep1_stationary_matrix(mesh, dof_map, ints, basis, ...
 							    u_x, u_y, ...
-							    rho, ...
-							    laminar_viscosity, ...
-							    smagorinsky_coefficient, ...
-							    smagorinsky_caracteristic_length);
+							    ctx);
+  for j = 1:3
+    rhs = navierstokes2d.assemble_p1bullep1_stationary_rhs(mesh, dof_map, ints, basis, ...
+							   u_x, u_y, p, ...
+							   force_f, ...
+							   ctx);
+    printf('rhs L2 norm: %f\n', sqrt(sum(rhs.^2)));
 
-  rhs = navierstokes2d.assemble_p1bullep1_stationary_rhs(mesh, dof_map, ints, ...
-							 u_x, u_y, p, ...
-							 force_f, ...
-							 rho, ...
-							 laminar_viscosity, ...
-							 smagorinsky_coefficient, ...
-							 smagorinsky_caracteristic_length);
-  [mat, rhs] = navierstokes2d.set_boundary_conditions(mesh, mat, rhs);
-  
-  delta_x = mat \ rhs;
-  printf('| delta_x | = %f\n', sqrt(sum(delta_x.^2)));
-  x = x - delta_x(1:(2 * n_u_dof + n_p_dof));
+    [mat_bc, rhs_bc] = navierstokes2d.set_boundary_conditions(mesh, mat, rhs);
+    
+    delta_x = mat_bc \ rhs_bc;
+    printf('| delta_x | = %f\n', sqrt(sum(delta_x.^2)));
+    x = x - delta_x(1:(2 * n_u_dof + n_p_dof));
+
+    u_x = x(1:n_u_dof);
+    u_y = x(n_u_dof + (1:n_u_dof));
+    p = x(2 * n_u_dof + (1:n_nodes));
+
+    vis = 1;
+    if vis
+      figure(1); hold on; cla;
+      gplot(mesh.adj, mesh.nodes);
+      h = quiver(mesh.nodes(:, 1), mesh.nodes(:, 2), u_x(1:n_nodes), u_y(1:n_nodes)); set(h, 'color', 'r');
+      figure(2); cla;
+      trisurf(mesh.elements, mesh.nodes(:, 1), mesh.nodes(:, 2), p);
+    end
+  end
 end
 
 u_x = u_x(1:n_nodes);

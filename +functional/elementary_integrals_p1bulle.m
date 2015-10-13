@@ -1,4 +1,4 @@
-function ints = elementary_integrals_p1bulle()
+function [ints, basis] = elementary_integrals_p1bulle()
 
   % elementary integrals for p1 lagrange
   ints = struct();
@@ -6,8 +6,8 @@ function ints = elementary_integrals_p1bulle()
   ints.phi = [1/6, 1/6, 1/6, 0.225];
   ints.dphi = [-1/2, 1/2,   0, 0,
 	       -1/2,   0, 1/2, 0];
-  ints.gradphi_p1 = [-1/2, 1/2,   0,
-		     -1/2,   0, 1/2];
+  ints.gradphi_p1 = [-1, 1, 0,
+		     -1, 0, 1];
 
   ints.dphidphi = reshape([ 0.5  ,  0.5  , -0.5  ,  0.   ,  0.   , -0.5  ,  0.   ,  0.   , ...
                             0.5  ,  0.5  , -0.5  ,  0.   ,  0.   , -0.5  ,  0.   ,  0.   , ...
@@ -17,6 +17,7 @@ function ints = elementary_integrals_p1bulle()
                             -0.5  , -0.5  ,  0.5  ,  0.   ,  0.   ,  0.5  ,  0.   ,  0.   , ...
                             0.   ,  0.   ,  0.   ,  0.   ,  0.   ,  0.   ,  4.05 ,  2.025, ...
                             0.   ,  0.   ,  0.   ,  0.   ,  0.   ,  0.   ,  2.025,  4.05 ], [2, 4, 2, 4]);
+  ints.dphidphi = load('+functional/dphidphi.m').dphidphi;
 
 
   ints.phidphi = reshape([-0.16666667, -0.16666667, -0.16666667, -0.225     , -0.16666667, ...
@@ -33,3 +34,9 @@ function ints = elementary_integrals_p1bulle()
                           0.08333333,  0.075     ,  0.075     ,  0.075     ,  0.075     , ...
                           0.14464286], [4, 4]);
   ints.phiphidphi = load('+functional/phiphidphi.m').phiphidphi;
+
+  basis = struct();
+
+  basis.phi  = {@(x) (1 - x(:, 1) - x(:, 2)),  @(x) x(:, 1),   @(x) x(:, 2),   @(x) 27 * (1 - x(:, 1) - x(:, 2)) .* x(:, 1) .* x(:, 2)};
+  basis.dphi = {@(x) -1,                       @(x) 1,         @(x) 0,         @(x) 27 * x(:, 2) .* (1 - 2*x(:, 1) - x(:, 2)),
+		@(x) -1,                       @(x) 0,         @(x) 1,         @(x) 27 * x(:, 1) .* (1 - x(:, 1) - 2*x(:, 2))};
