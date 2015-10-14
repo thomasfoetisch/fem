@@ -46,13 +46,12 @@ function mat = assemble_p1bullep1_stationary_matrix(mesh, dof_map, ints, basis, 
 	      end 
 	    end
 
-	    % viscosity .1
+	    % viscosity
 	    if 1
+	      % mu derivative:
 	      contrib = contrib + navierstokes2d.quadrature(@(x) navierstokes2d.viscosity_term_1(x, mesh, dof_map, ctx, u_x, u_y, el, basis, i, k, m, n));
-	    end % enable/disable
-	    
-	    if 1
-	       contrib = contrib + navierstokes2d.quadrature(@(x) navierstokes2d.viscosity_term_2(x, mesh, dof_map, ctx, u_x, u_y, el, basis, i, k, m, n));
+	      % epsilon derivative:
+	      contrib = contrib + navierstokes2d.quadrature(@(x) navierstokes2d.viscosity_term_2(x, mesh, dof_map, ctx, u_x, u_y, el, basis, i, k, m, n));
 	    end % enable/disable
 
 	    elem_u(i, k, m, n) = contrib;

@@ -44,7 +44,9 @@ function rhs = assemble_p1bullep1_stationary_rhs(mesh, dof_map, ints, basis,...
 	end
 
 	% viscosity:
-	contrib = contrib + navierstokes2d.quadrature(@(x) navierstokes2d.viscosity_term_rhs(x, mesh, dof_map, ctx, u_x, u_y, el, basis, i, k));
+	if 1
+	  contrib = contrib + navierstokes2d.quadrature(@(x) navierstokes2d.viscosity_term_rhs(x, mesh, dof_map, ctx, u_x, u_y, el, basis, i, k));
+	end
 
 	% pressure:
 	for q = 1:2
