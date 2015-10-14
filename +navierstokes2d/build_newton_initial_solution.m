@@ -8,8 +8,8 @@ function x = build_newton_initial_solution(mesh)
 
   x = zeros(n_dof, 1);
 
-  x(1:n_nodes) = mesh.nodes(:, 1);
-  x(n_u_dof + (1:n_nodes)) = mesh.nodes(:, 2);
+  %x(1:n_nodes) = mesh.nodes(:, 1);
+  %x(n_u_dof + (1:n_nodes)) = mesh.nodes(:, 2);
   
-  x(n_nodes + (1:n_elems)) = 1;
-  x(n_u_dof + n_nodes + (1:n_elems)) = 1;
+  %x(n_nodes + (1:n_elems)) = 1;
+  %x(n_u_dof + n_nodes + (1:n_elems)) = 1;

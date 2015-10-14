@@ -6,13 +6,17 @@ function [mat, rhs] = set_boundary_conditions(mesh, mat, rhs)
   n_p_dof = n_nodes;
   n_dof = 2 * n_u_dof + n_p_dof;
 
-  constraint = spalloc(2 * length(mesh.boundary_nodes) + 1, size(rhs, 1), 0);
   for i = 1:2
     for n = 1:length(mesh.boundary_nodes)
-      constraint((i - 1) * length(mesh.boundary_nodes) + n, (i - 1) * n_u_dof + mesh.boundary_nodes(n)) = 1;
+      mat(mesh.boundary_nodes(n), :) = 0;
+      mat(mesh.boundary_nodes(n), mesh.boundary_nodes(n)) = 1;
+      rhs(mesh.boundary_nodes(n)) = 0;
+
+      mat(n_u_dof + mesh.boundary_nodes(n), :) = 0;
+      mat(n_u_dof + mesh.boundary_nodes(n), n_u_dof + mesh.boundary_nodes(n)) = 1;
+      rhs(n_u_dof + mesh.boundary_nodes(n)) = 0;
     end
   end
-  constraint(end, end) = 1;
-
-  mat = [mat, constraint'; constraint, zeros(size(constraint, 1))];
-  rhs = [rhs; zeros(size(constraint, 1), 1)];
+  mat(end, :) = 0;
+  mat(end, end) = 1;
+  rhs(end) = 0;

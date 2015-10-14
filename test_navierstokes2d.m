@@ -1,4 +1,5 @@
 clear all;
+more off;
 
 % geometrical parameters of the domain:
 l_x = 1;
@@ -6,8 +7,8 @@ l_y = 1;
 
 
 % subdivisions of the domain:
-n_el_x = 2;
-n_el_y = 2;
+n_el_x = 10;
+n_el_y = 10;
 
 
 % pde parameters:
