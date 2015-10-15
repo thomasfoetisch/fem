@@ -147,6 +147,14 @@ function mesh = build_square_mesh(l_x, l_y, n_el_x, n_el_y, theta)
       node_bel_adj(node, :) = find(sum(boundary_edges(:, [1, 2]) == boundary_nodes(node), 2));
   end
 
+  % build the normals on the nodes:
+  normals_nodes = zeros(size(boundary_nodes, 1), 2);
+  for node = 1:size(boundary_nodes, 1)
+    normals_nodes(node, :) = (normals(node_bel_adj(node, 1), :) + normals(node_bel_adj(node, 2), :)) / 2;
+    normals_nodes(node, :) = normals_nodes(node, :) / sqrt(sum(normals_nodes(node, :).^2));
+  end
+  tangents_nodes = [normals_nodes(:, 2), -normals_nodes(:, 1)];
+  
   % return the result in a struct:
   mesh = struct('nodes', nodes,
 		'elements', elements,
@@ -165,5 +173,8 @@ function mesh = build_square_mesh(l_x, l_y, n_el_x, n_el_y, theta)
   mesh.boundary_barycenters = boundary_barycenters;
   mesh.tangents = tangents;
   mesh.normals = normals;
+  mesh.tangents_nodes = tangents_nodes;
+  mesh.normals_nodes = normals_nodes;
+  
 
 end

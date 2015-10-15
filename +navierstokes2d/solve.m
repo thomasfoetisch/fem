@@ -42,8 +42,9 @@ for k = 1:n_max_newton_iterations
     printf('rhs l2 norm: %g\n', rhs_norm_l2);
     newton_errors(end + 1) = rhs_norm_l2;
 
-    [mat_bc, rhs_bc] = navierstokes2d.set_boundary_conditions(mesh, mat, rhs);
+    [mat_bc, rhs_bc, T_inv] = navierstokes2d.set_boundary_conditions(mesh, mat, rhs);
     delta_x = mat_bc \ rhs_bc;
+    delta_x = T_inv * delta_x;
     
     printf('delta_x l2 norm: %g\n', sqrt(sum(delta_x.^2)));
 
