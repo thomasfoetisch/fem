@@ -25,7 +25,7 @@ mesh = geometry.build_square_mesh(l_x, l_y, n_el_x, n_el_y, 0);
 
 
 % solve the system:
-[u_x, u_y, p] = navierstokes2d.solve(mesh, force_f, ctx);
+[u_x, u_y, p, newton_errors] = navierstokes2d.solve(mesh, force_f, ctx);
 
 
 % visualize the result:

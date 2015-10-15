@@ -104,9 +104,9 @@ function mesh = build_square_mesh(l_x, l_y, n_el_x, n_el_y, theta)
   tangents = zeros(size(boundary_edges, 1), 2);
   boundary_barycenters = zeros(size(boundary_edges, 1), 2);
   for el = 1:size(boundary_edges, 1)
-    tangents(el, :) = mesh.nodes(boundary_edges(el, 1), :) - mesh.nodes(boundary_edges(el, 2), :);
+    tangents(el, :) = nodes(boundary_edges(el, 1), :) - nodes(boundary_edges(el, 2), :);
     tangents(el, :) = tangents(el, :) / sqrt(sum(tangents(el, :).^2));
-    boundary_barycenters(el, :) = (mesh.nodes(boundary_edges(el, 1), :) + mesh.nodes(boundary_edges(el, 2), :)) / 2;
+    boundary_barycenters(el, :) = (nodes(boundary_edges(el, 1), :) + nodes(boundary_edges(el, 2), :)) / 2;
   end
   normals = [tangents(:, 2), -tangents(:, 1)];
 
@@ -134,6 +134,12 @@ function mesh = build_square_mesh(l_x, l_y, n_el_x, n_el_y, theta)
     node_el_adj(node) = find(sum(elements == node, 2));
   end
 
+  % build the node - boundary-element adjacency list:
+  node_bel_adj = zeros(size(boundary_nodes, 1), 2);
+  for node = 1:size(boundary_nodes, 1)
+      node_bel_adj(node, :) = find(sum(boundary_edges == boundary_nodes(node), 2));
+  end
+
   % return the result in a struct:
   mesh = struct('nodes', nodes,
 		'elements', elements,
@@ -148,6 +154,7 @@ function mesh = build_square_mesh(l_x, l_y, n_el_x, n_el_y, theta)
   mesh.node_el_adj = node_el_adj;
 
   mesh.boundary_edges = boundary_edges;
+  mesh.node_bel_adj = node_bel_adj;
   mesh.boundary_barycenters = boundary_barycenters;
   mesh.tangents = tangents;
   mesh.normals = normals;

@@ -1,4 +1,4 @@
-function [u_x, u_y, p] = solve(mesh, force_f, ctx)
+function [u_x, u_y, p, newton_errors] = solve(mesh, force_f, ctx)
 
 % problem sizes:
 n_nodes = size(mesh.nodes, 1);
@@ -7,7 +7,7 @@ n_u_dof = n_nodes + n_elems;
 n_p_dof = n_nodes;
 n_dof = 2 * n_u_dof + n_p_dof;
 
-n_max_newton_iterations = 10;
+n_max_newton_iterations = 20;
 
 % build the degree of freedom mapping between the elements and the linear system:
 dof_map = [mesh.elements, (n_nodes + 1:n_u_dof)'];
@@ -24,11 +24,12 @@ u_y = x(n_u_dof + (1:n_u_dof));
 p = x(2 * n_u_dof + (1:n_nodes));
 
 % newton iteration:
+newton_errors = [];
 for k = 1:n_max_newton_iterations
   mat = navierstokes2d.assemble_p1bullep1_stationary_matrix(mesh, dof_map, ints, basis, ...
 							    u_x, u_y, ...
 							    ctx);
-  for j = 1:3
+  for j = 1:1
     rhs = navierstokes2d.assemble_p1bullep1_stationary_rhs(mesh, dof_map, ints, basis, ...
 							   u_x, u_y, p, ...
 							   force_f, ...
@@ -39,6 +40,7 @@ for k = 1:n_max_newton_iterations
     rhs_dofs = rhs([real_u_dof', n_u_dof + real_u_dof' , 2*n_u_dof + real_p_dof]);
     rhs_norm_l2 = sqrt(sum(rhs_dofs.^2));
     printf('rhs l2 norm: %g\n', rhs_norm_l2);
+    newton_errors(end + 1) = rhs_norm_l2;
 
     [mat_bc, rhs_bc] = navierstokes2d.set_boundary_conditions(mesh, mat, rhs);
     delta_x = mat_bc \ rhs_bc;
