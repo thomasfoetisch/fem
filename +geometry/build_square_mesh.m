@@ -79,15 +79,16 @@ function mesh = build_square_mesh(l_x, l_y, n_el_x, n_el_y, theta)
 
 
   % build the boundary node list:
-  edges = int16(zeros(3*size(elements, 1), 3));
+  edges = int16(zeros(3*size(elements, 1), 4));
   edges_number = 0;
   for e = 1:size(elements)
     for k = 1:3
       kk = mod(k, 3) + 1;
+      kkk = mod(kk, 3) + 1;
       edge = sort(elements(e, [k, kk]));
       loc = find(edges(:, 1) == edge(1) & edges(:, 2) == edge(2));
       if isempty(loc)
-	edges(edges_number + 1, :) = [edge, 1];
+	edges(edges_number + 1, :) = [edge, 1, elements(e, kkk)];
 	edges_number = edges_number + 1;
       else
 	edges(loc, 3) = edges(loc, 3) + 1;
@@ -99,16 +100,22 @@ function mesh = build_square_mesh(l_x, l_y, n_el_x, n_el_y, theta)
   inner_nodes = setdiff(1:size(nodes, 1), boundary_nodes);
 
   % build the normals and tangents to the boundary:
-  boundary_edges = edges(find(edges(:, 3) == 1), 1:2);
+  boundary_edges = edges(find(edges(:, 3) == 1), [1,2,4]);
 
   tangents = zeros(size(boundary_edges, 1), 2);
   boundary_barycenters = zeros(size(boundary_edges, 1), 2);
   for el = 1:size(boundary_edges, 1)
-    tangents(el, :) = nodes(boundary_edges(el, 1), :) - nodes(boundary_edges(el, 2), :);
+    tangents(el, :) = nodes(boundary_edges(el, 2), :) - nodes(boundary_edges(el, 1), :);
     tangents(el, :) = tangents(el, :) / sqrt(sum(tangents(el, :).^2));
     boundary_barycenters(el, :) = (nodes(boundary_edges(el, 1), :) + nodes(boundary_edges(el, 2), :)) / 2;
   end
   normals = [tangents(:, 2), -tangents(:, 1)];
+  for el = 1:size(boundary_edges, 1)
+    if (nodes(boundary_edges(el, 3), :) - nodes(boundary_edges(el, 1), :)) * normals(el, :)' > 0.0
+      tangents(el, :) = - tangents(el, :);
+      normals(el, :) = - normals(el, :);
+    end
+  end
 
 
   % build the barycenters of the elements:
@@ -137,7 +144,7 @@ function mesh = build_square_mesh(l_x, l_y, n_el_x, n_el_y, theta)
   % build the node - boundary-element adjacency list:
   node_bel_adj = zeros(size(boundary_nodes, 1), 2);
   for node = 1:size(boundary_nodes, 1)
-      node_bel_adj(node, :) = find(sum(boundary_edges == boundary_nodes(node), 2));
+      node_bel_adj(node, :) = find(sum(boundary_edges(:, [1, 2]) == boundary_nodes(node), 2));
   end
 
   % return the result in a struct:
