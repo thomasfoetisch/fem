@@ -98,6 +98,19 @@ function mesh = build_square_mesh(l_x, l_y, n_el_x, n_el_y, theta)
   boundary_nodes = sort(unique(edges(find(edges(:, 3) == 1), 1:2)));
   inner_nodes = setdiff(1:size(nodes, 1), boundary_nodes);
 
+  % build the normals and tangents to the boundary:
+  boundary_edges = edges(find(edges(:, 3) == 1), 1:2);
+
+  tangents = zeros(size(boundary_edges, 1), 2);
+  boundary_barycenters = zeros(size(boundary_edges, 1), 2);
+  for el = 1:size(boundary_edges, 1)
+    tangents(el, :) = mesh.nodes(boundary_edges(el, 1), :) - mesh.nodes(boundary_edges(el, 2), :);
+    tangents(el, :) = tangents(el, :) / sqrt(sum(tangents(el, :).^2));
+    boundary_barycenters(el, :) = (mesh.nodes(boundary_edges(el, 1), :) + mesh.nodes(boundary_edges(el, 2), :)) / 2;
+  end
+  normals = [tangents(:, 2), -tangents(:, 1)];
+
+
   % build the barycenters of the elements:
   barycenters = zeros(size(elements, 1), 2);
   for e = 1:size(elements, 1)
@@ -133,5 +146,10 @@ function mesh = build_square_mesh(l_x, l_y, n_el_x, n_el_y, theta)
 		'h', diameters);
 
   mesh.node_el_adj = node_el_adj;
+
+  mesh.boundary_edges = boundary_edges;
+  mesh.boundary_barycenters = boundary_barycenters;
+  mesh.tangents = tangents;
+  mesh.normals = normals;
 
 end
