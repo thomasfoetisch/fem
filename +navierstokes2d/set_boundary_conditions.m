@@ -31,9 +31,13 @@ function [mat, rhs, T_inv] = set_boundary_conditions(mesh, mat, rhs)
     T_inv(n_u_dof + node_id, node_id) = local_t_inv(2, 1);
     T_inv(n_u_dof + node_id, n_u_dof + node_id) = local_t_inv(2, 2);
   end
-  
+
+  % change variables on the degrees of freedom in the matrix:
   mat = T_inv*mat*T;
+
+  % the rhs need to be rotated too in order to have the basis function for the solution space and the test space syncronized.
   rhs = T_inv*rhs;
+
   
   % homogeneous dirichlet condition for the velocity:
   for n = 1:length(mesh.boundary_nodes)
