@@ -79,7 +79,7 @@ function mesh = build_square_mesh(l_x, l_y, n_el_x, n_el_y, theta)
 
 
   % build the boundary node list:
-  edges = int16(zeros(3*size(elements, 1), 4));
+  edges = int16(zeros(3*size(elements, 1), 5));
   edges_number = 0;
   for e = 1:size(elements)
     for k = 1:3
@@ -88,7 +88,7 @@ function mesh = build_square_mesh(l_x, l_y, n_el_x, n_el_y, theta)
       edge = sort(elements(e, [k, kk]));
       loc = find(edges(:, 1) == edge(1) & edges(:, 2) == edge(2));
       if isempty(loc)
-	edges(edges_number + 1, :) = [edge, 1, elements(e, kkk)];
+	edges(edges_number + 1, :) = [edge, 1, elements(e, kkk), e];
 	edges_number = edges_number + 1;
       else
 	edges(loc, 3) = edges(loc, 3) + 1;
@@ -101,7 +101,7 @@ function mesh = build_square_mesh(l_x, l_y, n_el_x, n_el_y, theta)
 
 
   % build the normals and tangents to the boundary:
-  boundary_edges = edges(find(edges(:, 3) == 1), [1,2,4]);
+  boundary_edges = edges(find(edges(:, 3) == 1), [1,2,4,5]);
 
   tangents = zeros(size(boundary_edges, 1), 2);
   boundary_barycenters = zeros(size(boundary_edges, 1), 2);
@@ -191,6 +191,4 @@ function mesh = build_square_mesh(l_x, l_y, n_el_x, n_el_y, theta)
   mesh.tangents_nodes = tangents_nodes;
   mesh.normals_nodes = normals_nodes;
   mesh.corner_nodes = corner_nodes;
-  
-
 end

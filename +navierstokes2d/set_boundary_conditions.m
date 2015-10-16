@@ -32,6 +32,7 @@ function [mat, rhs, T_inv] = set_boundary_conditions(mesh, mat, rhs)
     T_inv(n_u_dof + node_id, n_u_dof + node_id) = local_t_inv(2, 2);
   end
   
+  % change variables on the degrees of freedom in the matrix:
   mat = mat*T;
   
   % homogeneous dirichlet condition for the velocity:
