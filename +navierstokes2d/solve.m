@@ -61,6 +61,8 @@ for k = 1:n_max_newton_iterations
       h = quiver(mesh.nodes(:, 1), mesh.nodes(:, 2), u_x(1:n_nodes), u_y(1:n_nodes)); set(h, 'color', 'r');
       figure(2); cla;
       trisurf(mesh.elements, mesh.nodes(:, 1), mesh.nodes(:, 2), p);
+      figure(3); cla
+      semilogy(newton_errors);
     end
   end
 

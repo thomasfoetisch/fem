@@ -32,7 +32,8 @@ function [mat, rhs, T_inv] = set_boundary_conditions(mesh, mat, rhs)
     T_inv(n_u_dof + node_id, n_u_dof + node_id) = local_t_inv(2, 2);
   end
   
-  mat = mat*T;
+  mat = T_inv*mat*T;
+  rhs = T_inv*rhs;
   
   % homogeneous dirichlet condition for the velocity:
   for n = 1:length(mesh.boundary_nodes)
@@ -41,14 +42,19 @@ function [mat, rhs, T_inv] = set_boundary_conditions(mesh, mat, rhs)
     mat(mesh.boundary_nodes(n), mesh.boundary_nodes(n)) = 1;
     rhs(mesh.boundary_nodes(n)) = 0;
 
-   % tangent component:
-   %mat(n_u_dof + mesh.boundary_nodes(n), :) = 0;
-   %mat(n_u_dof + mesh.boundary_nodes(n), n_u_dof + mesh.boundary_nodes(n)) = 1;
-   %rhs(n_u_dof + mesh.boundary_nodes(n)) = 0;
+    % tangent component:
+    %mat(n_u_dof + mesh.boundary_nodes(n), :) = 0;
+    %mat(n_u_dof + mesh.boundary_nodes(n), n_u_dof + mesh.boundary_nodes(n)) = 1;
+    %rhs(n_u_dof + mesh.boundary_nodes(n)) = 0;
   end
 
   % homogeneous dirichlet condition on the corners;
   for n = 1:length(mesh.corner_nodes)
+   % normal component:
+   mat(mesh.corner_nodes(n), :) = 0;
+   mat(mesh.corner_nodes(n), mesh.corner_nodes(n)) = 1;
+   rhs(mesh.corner_nodes(n)) = 0;
+
    % tangent component:
    mat(n_u_dof + mesh.corner_nodes(n), :) = 0;
    mat(n_u_dof + mesh.corner_nodes(n), n_u_dof + mesh.corner_nodes(n)) = 1;
