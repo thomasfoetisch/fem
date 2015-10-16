@@ -99,6 +99,7 @@ function mesh = build_square_mesh(l_x, l_y, n_el_x, n_el_y, theta)
   boundary_nodes = sort(unique(edges(find(edges(:, 3) == 1), 1:2)));
   inner_nodes = setdiff(1:size(nodes, 1), boundary_nodes);
 
+
   % build the normals and tangents to the boundary:
   boundary_edges = edges(find(edges(:, 3) == 1), [1,2,4]);
 
@@ -117,7 +118,7 @@ function mesh = build_square_mesh(l_x, l_y, n_el_x, n_el_y, theta)
     end
   end
 
-
+  
   % build the barycenters of the elements:
   barycenters = zeros(size(elements, 1), 2);
   for e = 1:size(elements, 1)
@@ -147,6 +148,20 @@ function mesh = build_square_mesh(l_x, l_y, n_el_x, n_el_y, theta)
       node_bel_adj(node, :) = find(sum(boundary_edges(:, [1, 2]) == boundary_nodes(node), 2));
   end
 
+  
+  % build the corner node list:
+  corner_nodes = [];
+  for node = 1:size(boundary_nodes, 1)
+    if boundary_edges(node_bel_adj(node, 1), 3) == boundary_edges(node_bel_adj(node, 2), 3)
+      % two triangles with adjacent border edge share an inner edge (potentially not a corner, but in the case of the square, it is.):
+      corner_nodes(end + 1) = boundary_nodes(node);
+    elseif ismember(boundary_edges(node_bel_adj(node, 1), 3), boundary_edges(node_bel_adj(node, 2), [1:2]))
+      % two adjacent edges belong to the  same triangle:
+      corner_nodes(end + 1) = boundary_nodes(node);
+    end
+  end
+
+  
   % build the normals on the nodes:
   normals_nodes = zeros(size(boundary_nodes, 1), 2);
   for node = 1:size(boundary_nodes, 1)
@@ -175,6 +190,7 @@ function mesh = build_square_mesh(l_x, l_y, n_el_x, n_el_y, theta)
   mesh.normals = normals;
   mesh.tangents_nodes = tangents_nodes;
   mesh.normals_nodes = normals_nodes;
+  mesh.corner_nodes = corner_nodes;
   
 
 end

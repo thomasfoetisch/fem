@@ -35,18 +35,24 @@ function [mat, rhs, T_inv] = set_boundary_conditions(mesh, mat, rhs)
   mat = mat*T;
   
   % homogeneous dirichlet condition for the velocity:
-  for i = 1:2
-    for n = 1:length(mesh.boundary_nodes)
-      % normal component:
-      mat(mesh.boundary_nodes(n), :) = 0;
-      mat(mesh.boundary_nodes(n), mesh.boundary_nodes(n)) = 1;
-      rhs(mesh.boundary_nodes(n)) = 0;
+  for n = 1:length(mesh.boundary_nodes)
+    % normal component:
+    mat(mesh.boundary_nodes(n), :) = 0;
+    mat(mesh.boundary_nodes(n), mesh.boundary_nodes(n)) = 1;
+    rhs(mesh.boundary_nodes(n)) = 0;
 
-      % tangent component:
-      %mat(n_u_dof + mesh.boundary_nodes(n), :) = 0;
-      %mat(n_u_dof + mesh.boundary_nodes(n), n_u_dof + mesh.boundary_nodes(n)) = 1;
-      %rhs(n_u_dof + mesh.boundary_nodes(n)) = 0;
-    end
+   % tangent component:
+   %mat(n_u_dof + mesh.boundary_nodes(n), :) = 0;
+   %mat(n_u_dof + mesh.boundary_nodes(n), n_u_dof + mesh.boundary_nodes(n)) = 1;
+   %rhs(n_u_dof + mesh.boundary_nodes(n)) = 0;
+  end
+
+  % homogeneous dirichlet condition on the corners;
+  for n = 1:length(mesh.corner_nodes)
+   % tangent component:
+   mat(n_u_dof + mesh.corner_nodes(n), :) = 0;
+   mat(n_u_dof + mesh.corner_nodes(n), n_u_dof + mesh.corner_nodes(n)) = 1;
+   rhs(n_u_dof + mesh.corner_nodes(n)) = 0;
   end
 
   % pin the pressure in one point:
