@@ -1,15 +1,4 @@
-function x = build_newton_initial_solution(mesh)
-  % problem sizes:
-  n_nodes = size(mesh.nodes, 1);
-  n_elems = size(mesh.elements, 1);
-  n_u_dof = n_nodes + n_elems;
-  n_p_dof = n_nodes;
-  n_dof = 2 * n_u_dof + n_p_dof;
+function x = build_newton_initial_solution(mesh, force_f, ctx, boundary_conditions)
 
-  x = zeros(n_dof, 1);
-
-  %x(1:n_nodes) = mesh.nodes(:, 1);
-  %x(n_u_dof + (1:n_nodes)) = mesh.nodes(:, 2);
-  
-  %x(n_nodes + (1:n_elems)) = 1;
-  %x(n_u_dof + n_nodes + (1:n_elems)) = 1;
+  [u_x, u_y, p] = stokes2d.solve(mesh, ctx.laminar_viscosity, force_f, boundary_conditions);
+  x = [u_x; u_y; p];

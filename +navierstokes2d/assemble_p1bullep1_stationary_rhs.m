@@ -91,10 +91,10 @@ function rhs = assemble_p1bullep1_stationary_rhs(mesh, dof_map, ints, basis,...
   for ed = 1:n_edges
     for i = 1:2
       for k = 1:2
-	contrib = navierstokes2d.quadrature9_1d(@(x) navierstokes2d.boundary_term_rhs(x, mesh, u_x, u_y, pressure, ed, basis, i, k));
+	%contrib = navierstokes2d.quadrature9_1d(@(x) navierstokes2d.boundary_term_rhs(x, mesh, u_x, u_y, pressure, ed, basis, i, k));
 	  
-	rhs((i - 1) * n_u_dof + edge_dof_map(ed, k), 1) = ...
-	rhs((i - 1) * n_u_dof + edge_dof_map(ed, k), 1) + contrib; 
+	%rhs((i - 1) * n_u_dof + edge_dof_map(ed, k), 1) = ...
+	%rhs((i - 1) * n_u_dof + edge_dof_map(ed, k), 1) + contrib; 
       end
     end
   end

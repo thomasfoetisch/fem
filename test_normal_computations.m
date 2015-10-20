@@ -10,8 +10,7 @@ plot(x, y, '-o'); hold on;
 quiver(mesh.boundary_barycenters(:, 1), mesh.boundary_barycenters(:, 2), mesh.tangents(:, 1), mesh.tangents(:, 2), 0.25, 'g');
 quiver(mesh.boundary_barycenters(:, 1), mesh.boundary_barycenters(:, 2), mesh.normals(:, 1), mesh.normals(:, 2), 0.25, 'r');
 
-
-
-
 quiver(mesh.nodes(mesh.boundary_nodes, 1), mesh.nodes(mesh.boundary_nodes, 2), mesh.normals_nodes(:, 1), mesh.normals_nodes(:, 2), 'c');
 quiver(mesh.nodes(mesh.boundary_nodes, 1), mesh.nodes(mesh.boundary_nodes, 2), mesh.tangents_nodes(:, 1), mesh.tangents_nodes(:, 2), 'k');
+
+plot(mesh.nodes(mesh.boundary_nodes, 1), mesh.nodes(mesh.boundary_nodes, 2), 'ok');

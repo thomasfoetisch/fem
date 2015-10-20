@@ -1,4 +1,4 @@
-function [u_x, u_y, p, newton_errors] = solve(mesh, force_f, ctx)
+function [u_x, u_y, p, newton_errors] = solve(mesh, force_f, ctx, boundary_conditions)
 
 % problem sizes:
 n_nodes = size(mesh.nodes, 1);
@@ -18,7 +18,7 @@ dof_map = [mesh.elements, (n_nodes + 1:n_u_dof)'];
 
 
 % initialise the solution with a guess to start the newton iteration:
-x = navierstokes2d.build_newton_initial_solution(mesh);
+x = navierstokes2d.build_newton_initial_solution(mesh, force_f, ctx, boundary_conditions);
 u_x = x(1:n_u_dof);
 u_y = x(n_u_dof + (1:n_u_dof));
 p = x(2 * n_u_dof + (1:n_nodes));
@@ -42,9 +42,9 @@ for k = 1:n_max_newton_iterations
     printf('rhs l2 norm: %g\n', rhs_norm_l2);
     newton_errors(end + 1) = rhs_norm_l2;
 
-    [mat_bc, rhs_bc, T_inv] = navierstokes2d.set_boundary_conditions(mesh, mat, rhs);
+    [mat_bc, rhs_bc, rot_inv] = navierstokes2d.set_boundary_conditions(mesh, mat, rhs, boundary_conditions);
     delta_x = mat_bc \ rhs_bc;
-    delta_x = T_inv * delta_x;
+    delta_x = rot_inv * delta_x;
     
     printf('delta_x l2 norm: %g\n', sqrt(sum(delta_x.^2)));
 
