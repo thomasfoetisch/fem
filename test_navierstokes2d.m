@@ -9,15 +9,15 @@ l_y = 1;
 
 
 % subdivisions of the domain:
-n_el_x = 10;
-n_el_y = 10;
+n_el_x = 20;
+n_el_y = 20;
 
 
 % pde parameters:
 ctx = struct();
 ctx.rho = 1;
-ctx.laminar_viscosity = 0.01;
-ctx.smagorinsky_coefficient = 0.01;
+ctx.laminar_viscosity = 0.001;
+ctx.smagorinsky_coefficient = 0.001;
 ctx.smagorinsky_caracteristic_length = max(l_x, l_y);
 force_f = @(x) 0 * [x(:, 2) > 0.25, zeros(size(x, 1), 1)];
 
@@ -56,8 +56,12 @@ if vis
 
   figure(1); hold on; cla;
   gplot(mesh.adj, mesh.nodes);
-  h = quiver(mesh.nodes(:, 1), mesh.nodes(:, 2), u_x, u_y); set(h, 'color', 'r');
-  h = quiver(mesh.nodes(:, 1), mesh.nodes(:, 2), force_nodes(:, 1), force_nodes(:, 2)); set(h, 'color', 'g');
+  h = quiver(mesh.nodes(:, 1), mesh.nodes(:, 2), ...
+	     u_x(1:size(mesh.nodes, 1)), ...
+	     u_y(1:size(mesh.nodes))); set(h, 'color', 'r');
+  h = quiver(mesh.nodes(:, 1), mesh.nodes(:, 2), ...
+	     force_nodes(:, 1), ...
+	     force_nodes(:, 2)); set(h, 'color', 'g');
   figure(2); cla;
   trisurf(mesh.elements, mesh.nodes(:, 1), mesh.nodes(:, 2), p);
 end

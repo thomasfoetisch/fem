@@ -72,5 +72,5 @@ for k = 1:n_max_newton_iterations
 
 end
 
-u_x = u_x(1:n_nodes);
-u_y = u_y(1:n_nodes);
+%u_x = u_x(1:n_nodes);
+%u_y = u_y(1:n_nodes);
