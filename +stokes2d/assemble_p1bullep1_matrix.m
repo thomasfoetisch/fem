@@ -4,30 +4,29 @@ function mat = assemble_p1bullep1_matrix(mesh, dof_map, ints, mu)
   n_nodes = size(mesh.nodes, 1);
   n_elems = size(mesh.elements, 1);
   n_u_dof = n_nodes + n_elems;
+  n_p_dof = n_nodes;
   n_dof = n_u_dof * 2 + n_nodes;
 
   % allocate the matrix:
   mat = spalloc(n_dof, n_dof, 0);
 
   for el = 1:n_elems
+    printf('element %i / %i\n', el, n_elems);
+
     % elliptic term:
     elem_u = zeros(4, 2, 4, 2);
-    for sol_dim = 1:2
-      for test_dim = 1:2
-	if sol_dim == test_dim
-	  for i = 1:4
-	    for j = 1:4
-	      for k = 1:2
-		for p = 1:2
-		  for q = 1:2
-		    elem_u(i, sol_dim, j, test_dim) ...
-		    = elem_u(i, sol_dim, j, test_dim) ...
-		      + mu * mesh.jac(el) ...
-			* mesh.jmt(k, p, el) ...
-			* mesh.jmt(k, q, el) ...
-			* ints.dphidphi(p, i, q, j);
-		  end
-		end
+    for dim = 1:2
+      for i = 1:4
+	for j = 1:4
+	  for k = 1:2
+	    for p = 1:2
+	      for q = 1:2
+		elem_u(i, dim, j, dim) ...
+		= elem_u(i, dim, j, dim) ...
+		  + mu * mesh.jac(el) ...
+		    * mesh.jmt(k, p, el) ...
+		    * mesh.jmt(k, q, el) ...
+		    * ints.dphidphi(p, i, q, j);
 	      end
 	    end
 	  end
@@ -59,7 +58,7 @@ function mat = assemble_p1bullep1_matrix(mesh, dof_map, ints, mu)
 	  for p = 1:2
 	    elem_div(i, sol_dim, j) ...
 	    = elem_div(i, sol_dim, j) ...
-	      + mesh.jac(el) ...
+	      - mesh.jac(el) ...
 		* mesh.jmt(sol_dim, p, el) ...
 		* ints.phidphi(j, p, i);
 	  end
@@ -71,16 +70,12 @@ function mat = assemble_p1bullep1_matrix(mesh, dof_map, ints, mu)
     % accumulate everything in the linear system:
     for i = 1:4
       for j = 1:4
-	for sol_dim = 1:2
-	  for test_dim = 1:2
-	    if test_dim == sol_dim
-	      mat((test_dim - 1) * n_u_dof + dof_map(el, j),...
-		  (sol_dim - 1) * n_u_dof + dof_map(el, i)) ...
-	      = mat((test_dim - 1) * n_u_dof + dof_map(el, j), ...
-		    (sol_dim - 1) * n_u_dof + dof_map(el, i)) ...
-		+ elem_u(i, sol_dim, j, test_dim);
-	    end
-	  end
+	for dim = 1:2
+	  mat((dim - 1) * n_u_dof + dof_map(el, j),...
+	      (dim - 1) * n_u_dof + dof_map(el, i)) ...
+	  = mat((dim - 1) * n_u_dof + dof_map(el, j), ...
+		(dim - 1) * n_u_dof + dof_map(el, i)) ...
+	    + elem_u(i, dim, j, dim);
 	end
       end
     end

@@ -65,7 +65,9 @@ function [mat, rhs, rot_inv] = set_boundary_conditions(mesh, mat, rhs, boundary_
     end
   end
   
-  % pin the pressure in one point:
-  mat(end, :) = 0;
-  mat(end, end) = 1;
-  rhs(end) = 0;
+  % pin the pressure in one point (ideally on the center of the square):
+  pinned_pressure_dof = 2 * n_u_dof + n_p_dof;
+
+  mat(pinned_pressure_dof, :) = 0;
+  mat(pinned_pressure_dof, pinned_pressure_dof) = 1;
+  rhs(pinned_pressure_dof) = 0;

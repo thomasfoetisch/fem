@@ -1,4 +1,4 @@
-function [u_x, u_y, p, x] = solve_linear_system(mesh, mat, rhs, rot_inv)
+function [u_x, u_y, p, x] = solve_linear_system(mesh, mat, rhs, rot_inv, lifting)
 
   % system sizes:
   n_nodes = size(mesh.nodes, 1);
@@ -7,7 +7,10 @@ function [u_x, u_y, p, x] = solve_linear_system(mesh, mat, rhs, rot_inv)
   n_dof = n_u_dof * 2 + n_nodes;
 
   % solve and extract the components:
-  x = mat \ rhs;
+  %x = mat \ rhs;
+  [L, U] = ilu(mat, struct('type', 'ilutp', 'droptol', 1e-1, 'udiag', 1));
+  x = gmres(mat, rhs, 1000, 1e-10, 1000, L, U);
+  x(1:(2*n_u_dof)) = x(1:(2*n_u_dof)) + lifting;
   x = full(rot_inv * x);
 
   % split each component:

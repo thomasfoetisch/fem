@@ -7,7 +7,7 @@ function [ints, basis] = elementary_integrals_p1bulle()
   ints.dphi = [-1/2, 1/2,   0, 0,
 	       -1/2,   0, 1/2, 0];
   ints.gradphi_p1 = [-1, 1, 0,
-		     -1, 0, 1];
+                     -1, 0, 1];
 
   ints.dphidphi = reshape([ 0.5  ,  0.5  , -0.5  ,  0.   ,  0.   , -0.5  ,  0.   ,  0.   , ...
                             0.5  ,  0.5  , -0.5  ,  0.   ,  0.   , -0.5  ,  0.   ,  0.   , ...
