@@ -11,7 +11,7 @@ function mat = assemble_p1bullep1_matrix(mesh, dof_map, ints, mu)
   mat = spalloc(n_dof, n_dof, 0);
 
   for el = 1:n_elems
-    printf('element %i / %i\n', el, n_elems);
+    printf('matrix element %i / %i\n', el, n_elems);
 
     % elliptic term:
     elem_u = zeros(4, 2, 4, 2);
