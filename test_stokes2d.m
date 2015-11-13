@@ -14,8 +14,8 @@ l_x = 1;
 l_y = 1;
 
 % subdivisions of the domain:
-n_el_x = 64;
-n_el_y = 64;
+n_el_x = 128;
+n_el_y = 128;
 
 % build a square mesh:
 mesh = geometry.build_square_mesh(l_x, l_y, n_el_x, n_el_y, 0*pi/6);

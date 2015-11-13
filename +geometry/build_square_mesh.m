@@ -14,14 +14,14 @@ function mesh = build_square_mesh(l_x, l_y, n_el_x, n_el_y, theta)
   end
 
   nodes = reshape(nodes, [(n_el_x + 1) * (n_el_y + 1), 2]);
-  nodes_indices = reshape(int16(1:((n_el_x + 1) * (n_el_y + 1))),
+  nodes_indices = reshape(int32(1:((n_el_x + 1) * (n_el_y + 1))),
 			  [n_el_x + 1, n_el_y + 1]);
 
   rot = @(theta) [cos(theta), -sin(theta); sin(theta), cos(theta)];
   nodes = (rot(theta)*nodes')';
 
   % build elements:
-  elements = int16(zeros(3, 2, n_el_x ,n_el_y));
+  elements = int32(zeros(3, 2, n_el_x ,n_el_y));
   for i = 1:n_el_x
     for j = 1:n_el_y
       % first triangle:
@@ -51,7 +51,7 @@ function mesh = build_square_mesh(l_x, l_y, n_el_x, n_el_y, theta)
   for e = 1:size(elements, 1)
     %elements(e, :) = elements(e, randperm(3));
   end
-  elements = int16(elements);
+  elements = int32(elements);
 
 
   % build the adjacency matrix:
@@ -79,7 +79,7 @@ function mesh = build_square_mesh(l_x, l_y, n_el_x, n_el_y, theta)
 
 
   % build the boundary node list:
-  edges = int16(zeros(3*size(elements, 1), 5));
+  edges = int32(zeros(3*size(elements, 1), 5));
   edges_number = 0;
   for e = 1:size(elements)
     for k = 1:3
