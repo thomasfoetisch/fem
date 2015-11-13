@@ -13,6 +13,8 @@ function rhs = assemble_p1bullep1_rhs(mesh, dof_map, ints, lifting, force_f)
   
   % build the rhs:
   for el = 1:n_elems
+    printf('rhs element %i / %i\n', el, n_elems);
+
     for sol_dim = 1:2
       for i = 1:4
 	for k = 1:3 % no bubble for the force field
