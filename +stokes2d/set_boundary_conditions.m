@@ -32,7 +32,10 @@ function [mat, rhs, rot_inv] = set_boundary_conditions(mesh, mat, rhs, boundary_
       rot_inv = spalloc(n_dof, n_dof, 0);
 
       % initialize with the identity matrix:
-      rot_inv(sub2ind(size(rot_inv), 1:n_dof, 1:n_dof)) = 1;
+      %rot_inv(sub2ind(size(rot_inv), 1:n_dof, 1:n_dof)) = 1;
+      for i = 1:size(rot_inv, 1)
+	rot_inv(i, i) = 1;
+      end
   end
   
 

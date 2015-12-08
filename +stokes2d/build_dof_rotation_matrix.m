@@ -12,8 +12,10 @@ function [rot, rot_inv] = build_dof_rotation_matrix(mesh, nodes, new_basis)
   rot_inv = spalloc(n_dof, n_dof, 0);
 
   % initialize with the identity matrix:
-  rot(sub2ind(size(rot), 1:n_dof, 1:n_dof)) = 1;
-  rot_inv(sub2ind(size(rot_inv), 1:n_dof, 1:n_dof)) = 1;
+  for i = 1:size(rot, 1)
+    rot(i, i) = 1;
+    rot_inv(i, i) = 1;
+  end
   
   % loop over all the selected boundary nodes:
   for node = 1:length(nodes);
